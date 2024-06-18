@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">studentracker</string>
+    <string name="app_name">StudentTracker</string>
+    <string name="student_list_label">Student List:</string>
+    <string name="add_student_button">Add Student</string>
 </resources>

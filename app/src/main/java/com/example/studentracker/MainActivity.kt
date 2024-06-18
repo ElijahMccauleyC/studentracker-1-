@@ -1,47 +1,93 @@
 package com.example.studentracker
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.studentracker.ui.theme.StudentrackerTheme
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import java.util.*
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var studentListTextView: TextView
+    private lateinit var addStudentButton: Button
+    private lateinit var studentNameEditText: EditText // Declare EditText
+
+    private val studentList = ArrayList<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            StudentrackerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        setContentView(R.layout.activity_main)
+
+        studentListTextView = findViewById(R.id.studentListTextView)
+        addStudentButton = findViewById(R.id.addStudentButton)
+        studentNameEditText = findViewById(R.id.studentNameEditText) // Initialize EditText
+
+        addStudentButton.setOnClickListener {
+            addStudent()
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun addStudent() {
+        if (studentList.size >= 10) {
+            // Maximum students reached, handle accordingly (show message, disable button, etc.)
+            return
+        }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    StudentrackerTheme {
-        Greeting("Android")
+        // Get student name from EditText
+        val newStudentName = studentNameEditText.text.toString().trim()
+
+        // Check if the name starts with a capital letter
+        if (!newStudentName.matches(Regex("^[A-Z].*"))) {
+            // Display error or inform the user that the name should start with a capital letter
+            studentNameEditText.error = "Name must start with a capital letter"
+            return
+        }
+
+        // Check if the student already exists
+        if (studentList.contains(newStudentName)) {
+            // Optionally handle the case where the student is already in the list
+            return
+        }
+
+        // Name is valid, add to the list
+        studentList.add(newStudentName)
+
+        // Sort studentList alphabetically
+        studentList.sort()
+
+        // Update the student list display
+        updateStudentList()
+
+        // Clear EditText after adding student
+        studentNameEditText.text.clear()
+    }
+
+    private fun removeStudent(studentName: String) {
+        // Remove student from the list
+        studentList.remove(studentName)
+
+        // Update the student list display
+        updateStudentList()
+    }
+
+    private fun updateStudentList() {
+        // Build the list string
+        val sb = StringBuilder()
+        for (student in studentList) {
+            sb.append(student).append("\n")
+        }
+        studentListTextView.text = sb.toString()
+
+        // Set click listener for student names
+        studentListTextView.setOnClickListener { view ->
+            val clickedText = (view as TextView).text.toString()
+
+            // Extract student name from clickedText
+            val studentName = clickedText.substringBefore("\n")
+
+            // Call removeStudent() function
+            removeStudent(studentName)
+        }
     }
 }
